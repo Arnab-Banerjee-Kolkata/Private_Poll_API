@@ -52,8 +52,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		
 		$response['validAccount']=true;
 		
-		$stmt3=$conn->prepare("SELECT COUNT(id) FROM Poll WHERE account_id=? AND status=0");
-		$stmt3->bind_param("s",$emailId);
+		$stmt3=$conn->prepare("SELECT COUNT(id) FROM Poll WHERE id=? AND account_id=? AND status=0");
+		$stmt3->bind_param("ds",$pollId,$emailId);
 		$stmt3->execute();
 		$stmt3->bind_result($count2);
 		
