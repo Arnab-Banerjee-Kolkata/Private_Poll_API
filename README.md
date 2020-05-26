@@ -7,6 +7,12 @@ Account status:<br>
 1: Logged in<br>
 2: Suspended<br>
 <br>
+Poll status:<br>
+0: Pending<br>
+1: Active<br>
+2: Completed<br>
+3: Cancelled<br>
+<br>
 <br>
 <br>
 <b>INSTRUCTIONS TO CLONE THIS REPO</b><br>
