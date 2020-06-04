@@ -74,7 +74,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 				
 				while($stmt4->fetch())
 				{
-                    $options=array();
+                    			$options=array();
                     
 					$options['optionId']=$optionId;
 					$options['optionName']=$optionName;
@@ -82,7 +82,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 					
 					array_push($details,$options);
 				}
-                $response['options']=$details;
+				$response['options']=$details;
 
 				$stmt4->close();
 			}
