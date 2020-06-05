@@ -49,6 +49,13 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		if($uppercase && $lowercase && $number && $specialChars && strlen($password) >= 8 && strlen($password) <= 20)
 		{
 			$response['validPassword']=true;
+			
+			$stmt2=$conn->prepare("INSERT INTO Account(email_id,status,password) VALUES(?,1,?)");
+			$stmt2->bind_param("ss",$emailId,$password);
+			$stmt2->execute();
+			$stmt2->fetch();
+			$stmt2->close();
+
 			$response['success']=true;
 		}
 	}
