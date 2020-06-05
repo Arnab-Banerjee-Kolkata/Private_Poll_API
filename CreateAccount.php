@@ -37,8 +37,16 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
     $stmt->close();
     $response['validAuth']=true;
 	
-	if(filter_var($emailId, FILTER_VALIDATE_EMAIL))		//email validation
+	$stmt3=$conn->prepare("SELECT COUNT(email_id) FROM Account WHERE email_id=?");
+	$stmt3->bind_param("s",$emailId);
+	$stmt3->execute();
+	$stmt3->bind_result($count);
+	$stmt3->fetch();
+	
+	if($count==0 && filter_var($emailId, FILTER_VALIDATE_EMAIL))		//email validation
 	{
+		$count=-1;
+		$stmt3->close();
 		$response['validEmail']=true;
 		
 		$uppercase=preg_match('@[A-Z]@', $password);	//password validation
@@ -49,16 +57,18 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		if($uppercase && $lowercase && $number && $specialChars && strlen($password) >= 8 && strlen($password) <= 20)
 		{
 			$response['validPassword']=true;
-			
-			$stmt2=$conn->prepare("INSERT INTO Account(email_id,status,password) VALUES(?,1,?)");
-			$stmt2->bind_param("ss",$emailId,$password);
-			$stmt2->execute();
-			$stmt2->fetch();
-			$stmt2->close();
+
+            $stmt2=$conn->prepare("INSERT INTO Account(email_id,status,password) VALUES(?,1,?)");
+            $stmt2->bind_param("ss",$emailId,$password);
+            $stmt2->execute();
+            $stmt2->fetch();
+            $stmt2->close();
 
 			$response['success']=true;
 		}
 	}
+	else
+		$stmt3->close();
 }
 
 else
