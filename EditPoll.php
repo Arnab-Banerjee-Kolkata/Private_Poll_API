@@ -33,6 +33,7 @@ $response['success']=false;
 $response['validAuth']=false;
 $response['validEmail']=false;
 $response['validPoll']=false;
+$response['validOptions']=false;
 
 $stmt=$conn->prepare("SELECT value FROM Auth_Keys WHERE name =?");
 $stmt->bind_param("s", $key_name);
@@ -65,34 +66,41 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$count2=-1;
 			$stmt3->close();
 			$response['validPoll']=true;
-			
-			$stmt4=$conn->prepare("DELETE FROM Polling_Options WHERE poll_id=?");
-			$stmt4->bind_param("d",$pollId);
-			$stmt4->execute();
-			$stmt4->fetch();
-			$stmt4->close();
-			
-			$temp=0;
-			
-			while($options[$temp])
-			{
-				$stmt5=$conn->prepare("INSERT INTO Polling_Options(option_name,poll_id,vote_count) VALUES(?,?,0)");
-				$stmt5->bind_param("sd",$options[$temp],$pollId);
+
+            $temparr=array_map('strtoupper',$options);
+            
+            if(count($temparr) == count(array_unique($temparr)))
+            {
+                $response['validOptions']=true;
+
+		    	$stmt4=$conn->prepare("DELETE FROM Polling_Options WHERE poll_id=?");
+		    	$stmt4->bind_param("d",$pollId);
+		    	$stmt4->execute();
+		    	$stmt4->fetch();
+		    	$stmt4->close();
+
+		    	$temp=0;
+    
+		    	while($options[$temp])
+	    		{
+		    		$stmt5=$conn->prepare("INSERT INTO Polling_Options(option_name,poll_id,vote_count) VALUES(?,?,0)");
+			    	$stmt5->bind_param("sd",$options[$temp],$pollId);
 				$stmt5->execute();
-				$stmt5->fetch();
-				$stmt5->close();
-				
-				$temp++;
-			}
-			
-			$stmt6=$conn->prepare("UPDATE Poll SET topic=?,max_votes=? WHERE id=?");
-			$stmt6->bind_param("sdd",$topic,$maxVotes,$pollId);
+    				$stmt5->fetch();
+	    			$stmt5->close();
+    
+	    			$temp++;
+		    	}
+    
+	    		$stmt6=$conn->prepare("UPDATE Poll SET topic=?,max_votes=? WHERE id=?");
+		    	$stmt6->bind_param("sdd",$topic,$maxVotes,$pollId);
 			$stmt6->execute();
-			$stmt6->fetch();
-			$stmt6->close();
-			
-			$response['success']=true;
-		}
+	    		$stmt6->fetch();
+		    	$stmt6->close();
+    
+	    		$response['success']=true;
+		    }
+        	}
 		else
 			$stmt3->close();
 	}
