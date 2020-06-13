@@ -33,6 +33,7 @@ $response['success']=false;
 $response['validAuth']=false;
 $response['validEmail']=false;
 $response['validPoll']=false;
+$response['validMaxVotes']=false;
 $response['validOptions']=false;
 
 $stmt=$conn->prepare("SELECT value FROM Auth_Keys WHERE name =?");
@@ -56,8 +57,8 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 		$stmt2->close();
 		$response['validEmail']=true;
 		
-		$stmt3=$conn->prepare("SELECT COUNT(id) FROM Poll WHERE account_id=? AND status=0");
-		$stmt3->bind_param("s",$emailId);
+		$stmt3=$conn->prepare("SELECT COUNT(id) FROM Poll WHERE id=? AND account_id=? AND status=0");
+		$stmt3->bind_param("ds",$pollId,$emailId);
 		$stmt3->execute();
 		$stmt3->bind_result($count2);
 		
@@ -66,10 +67,15 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$count2=-1;
 			$stmt3->close();
 			$response['validPoll']=true;
-
-            $temparr=array_map('strtoupper',$options);
+			
+			if($maxVotes>=1 or $maxVotes==null)
+			{
+				
+			$response['validMaxVotes']=true;
+				
+			$temparr=array_map('strtoupper',$options);
             
-            if(count($temparr) == count(array_unique($temparr)))
+            if(count($temparr) == count(array_unique($temparr)) && !empty($options))
             {
                 $response['validOptions']=true;
 
@@ -85,7 +91,7 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	    		{
 		    		$stmt5=$conn->prepare("INSERT INTO Polling_Options(option_name,poll_id,vote_count) VALUES(?,?,0)");
 			    	$stmt5->bind_param("sd",$options[$temp],$pollId);
-				$stmt5->execute();
+				    $stmt5->execute();
     				$stmt5->fetch();
 	    			$stmt5->close();
     
@@ -94,13 +100,14 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
     
 	    		$stmt6=$conn->prepare("UPDATE Poll SET topic=?,max_votes=? WHERE id=?");
 		    	$stmt6->bind_param("sdd",$topic,$maxVotes,$pollId);
-			$stmt6->execute();
+			    $stmt6->execute();
 	    		$stmt6->fetch();
 		    	$stmt6->close();
     
 	    		$response['success']=true;
 		    }
-        	}
+			}
+        }
 		else
 			$stmt3->close();
 	}
