@@ -91,16 +91,19 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 	    		{
 		    		$stmt5=$conn->prepare("INSERT INTO Polling_Options(option_name,poll_id,vote_count) VALUES(?,?,0)");
 			    	$stmt5->bind_param("sd",$options[$temp],$pollId);
-				    $stmt5->execute();
+				$stmt5->execute();
     				$stmt5->fetch();
 	    			$stmt5->close();
     
 	    			$temp++;
 		    	}
-    
+
+                	if($maxVotes==0)
+				$maxVotes=null;
+                    
 	    		$stmt6=$conn->prepare("UPDATE Poll SET topic=?,max_votes=? WHERE id=?");
 		    	$stmt6->bind_param("sdd",$topic,$maxVotes,$pollId);
-			    $stmt6->execute();
+			$stmt6->execute();
 	    		$stmt6->fetch();
 		    	$stmt6->close();
     
