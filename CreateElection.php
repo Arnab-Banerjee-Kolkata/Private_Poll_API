@@ -69,6 +69,9 @@ if($stmt->fetch() && $postAuthKey1==$postAuthKey2)
 			$entryCode=generateOtp($INTERNAL_AUTH_KEY);
 			$endCode=generateOtp($INTERNAL_AUTH_KEY); 
 			
+            		if($maxVotes==0)
+                		$maxVotes=null;
+                
 			$stmt3=$conn->prepare("INSERT INTO Poll(entry_code,end_code,max_votes,status,account_id,topic) VALUES(?,?,?,0,?,?)");
 			$stmt3->bind_param("ssdss",$entryCode,$endCode,$maxVotes,$emailId,$topic);
 			$stmt3->execute();
